@@ -1,16 +1,17 @@
 import rest_framework
 from django.shortcuts import render
-from rest_framework import generics
-from rest_framework.decorators import api_view
+from rest_framework import generics, viewsets
+from rest_framework.decorators import api_view, action
 from rest_framework.filters import OrderingFilter, SearchFilter
 from django_filters import rest_framework as filters
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .filter import ServiseFilter
-from .models import Category, Service, Salon
+from .models import Category, Service, Salon, ProstoModel
 from .serializers import ServiceSerializer, CategorySerializer, AddServiceSerializer, SalonSerializer, \
-    AddSalonSerializer
+    AddSalonSerializer, ProstoModelSerializer, SaveSalonSerializer
 
 
 class ServiceApi(generics.ListAPIView):
@@ -44,8 +45,13 @@ class CategoryApi(generics.ListAPIView, generics.CreateAPIView):
 
 @api_view()
 def get_category_for_salon(request, pk):
-    category_list = Category.objects.filter(service__salon__id=pk).distinct()
+    # category_list = Category.objects.filter(service__salon__id=pk).distinct()
+    # serializer = CategorySerializer(category_list, many=True)
+
+    categories = Category.objects.prefetch_related("service_set").all()
+    category_list = categories.filter(service__salon__id=pk).distinct()
     serializer = CategorySerializer(category_list, many=True)
+    print(categories)
     return Response(serializer.data)
 
 @api_view()
@@ -57,12 +63,23 @@ def get_services_for_title(request, text):
     # time.sleep(10)
     return Response(serializer.data)
 
+@api_view()
+def get_services_for_salon(request, pk):
 
-class SalonsApi(generics.ListAPIView):
+    services = Service.objects.prefetch_related("salon_set")
+    services_list = services.filter(salon__id=pk)
+    serializer = ServiceSerializer(services_list, many=True)
+    print(services, "Все сервисы???????????????")
+    print(services_list, "Сервисы по салону!!!!!!!!!!!!!!!")
+    return Response(serializer.data)
+
+
+class SalonsApi(generics.ListAPIView, generics.CreateAPIView):
 
     serializer_class = SalonSerializer
     model = Salon
     queryset = Salon.objects.all()
+
 
 
 
@@ -71,6 +88,27 @@ class AddSalonsApi(generics.CreateAPIView):
     serializer_class = AddSalonSerializer
     model = Salon
     queryset = Salon.objects.all()
+
+class ProstoModelViewSet(viewsets.ModelViewSet):
+
+    queryset = ProstoModel.objects.all()
+    serializer_class = ProstoModelSerializer
+
+class AdddSalonsApi(APIView):
+
+    def post(self, request):
+        data = SaveSalonSerializer(data=request.data)
+        if data.is_valid():
+            instanse = Salon(name=request.data["name"], slug=request.data["slug"])
+            instanse.save()
+            for i in request.data["services"]:
+                instanse.services.add(i)
+            instanse.save()
+            return Response({"data":AddSalonSerializer(Salon.objects.all(), many=True).data})
+        else:
+            return Response({"status": "NotOk"})
+
+
 
 # @api_view()
 # def get_services_for_title(request, text):

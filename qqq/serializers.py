@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Category, Service, Salon
+from .models import Category, Service, Salon, ProstoModel
 
 
 class AddSalonSerializer(serializers.ModelSerializer):
@@ -41,6 +41,19 @@ class SalonSerializer(serializers.Serializer):
     slug = serializers.CharField()
     services = ServiceSerializer(many=True)
 
+class SaveSalonSerializer(serializers.Serializer):
+    "Для получения всех салонов"
+
+    name = serializers.CharField(max_length=255)
+    slug = serializers.CharField()
+    services = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), many=True)
+
+class ProstoModelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProstoModel
+        fields = '__all__'
+    # services = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), many=True)
 
 
 

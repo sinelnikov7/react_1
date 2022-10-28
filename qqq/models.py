@@ -31,4 +31,9 @@ class Salon(models.Model):
     def __str__(self):
         return self.name
 
+class ProstoModel(models.Model):
+    title = models.CharField(max_length=255)
+    qqqqq = models.CharField(max_length=255)
+    wwwww = models.CharField(max_length=255)
+
 # Create your models here.

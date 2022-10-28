@@ -15,7 +15,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     # salon_set = AddSalonSerializer(many=True)
     class Meta:
         model = Service
-        depth = 1
+        depth = 0
         fields = ('id', 'title', 'slug', 'price', 'category', 'salon_set')
 
 
@@ -54,6 +54,27 @@ class ProstoModelSerializer(serializers.ModelSerializer):
         model = ProstoModel
         fields = '__all__'
     # services = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), many=True)
+
+
+class NewServiceSerializer(serializers.Serializer):
+    "Для получения всех салонов"
+    id = serializers.IntegerField(required=False)
+    title = serializers.CharField(max_length=255)
+    price = serializers.DecimalField(max_digits=8, decimal_places=2)
+    slug = serializers.CharField()
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
+    salon_set = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), many=True)
+
+
+    def create(self, validated_data):
+
+        new_service = Service(title=validated_data["title"], slug=validated_data["slug"],
+                                             price=validated_data["price"], category_id=validated_data["category"].id)
+        new_service.save()
+        for i in validated_data["salon_set"]:
+            new_service.salon_set.add(i.id)
+
+        return new_service
 
 
 

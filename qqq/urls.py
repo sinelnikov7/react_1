@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework import routers
 
 from .views import CategoryApi, get_services_for_salon, ServiceApi, get_services_for_title, AddServiceApi, SalonsApi, \
-    AdddSalonsApi, get_category_for_salon, ProstoModelViewSet
+    AdddSalonsApi, get_category_for_salon, ProstoModelViewSet, NewServiceApi
 
 app_name = 'api'
 
@@ -20,11 +20,10 @@ urlpatterns = [
     path('services/<str:text>', get_services_for_title),
     path('categories_for_salon/<int:pk>', get_category_for_salon),
     path('services_for_salon/<int:pk>', get_services_for_salon),
+    path('new_services/', NewServiceApi.as_view()),
     # path('', include(router.urls)),
 
 ]
 
 urlpatterns += router.urls
-print(router)
-print(router.urls)
-print(urlpatterns)
+

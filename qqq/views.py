@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from .filter import ServiseFilter
 from .models import Category, Service, Salon, ProstoModel
 from .serializers import ServiceSerializer, CategorySerializer, AddServiceSerializer, SalonSerializer, \
-    AddSalonSerializer, ProstoModelSerializer, SaveSalonSerializer
+    AddSalonSerializer, ProstoModelSerializer, SaveSalonSerializer, NewServiceSerializer
 
 
 class ServiceApi(generics.ListAPIView):
@@ -109,9 +109,14 @@ class AdddSalonsApi(APIView):
             return Response({"status": "NotOk"})
 
 
+class NewServiceApi(APIView):
+    def get(self, request):
+        queryset = Service.objects.all()
+        serializers = NewServiceSerializer(queryset, many=True)
+        return Response({"data": serializers.data})
 
-# @api_view()
-# def get_services_for_title(request, text):
-#     service = Service.objects.filter(category__name=text)
-#     serializer = ServiceSerializer(service, many=True)
-#     return Response(serializer.data)
+    def post(self, request):
+        serializer = NewServiceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        response = serializer.create(serializer.validated_data)
+        return Response(NewServiceSerializer(response).data)

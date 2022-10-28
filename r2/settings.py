@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'qqq',
 
     'drf_yasg',
     'corsheaders',
@@ -44,7 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'debug_toolbar',
 
-    'qqq',
+
 ]
 
 MIDDLEWARE = [

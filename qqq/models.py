@@ -26,7 +26,7 @@ class Service(models.Model):
 class Salon(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
-    services = models.ManyToManyField(Service, blank=True, null=True)
+    services = models.ManyToManyField(Service)
 
     def __str__(self):
         return self.name
